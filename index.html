@@ -30,7 +30,6 @@
             const labels = data.map(item => item.timestamp);
             
             // Mapowanie wartości z czujnika BME280 z tolerancją na nazwy pól
-            const labels = data.map(item => item.timestamp);
             const temps  = data.map(item => parseFloat(item.payload?.temperature ?? item.temperature));
             const hums   = data.map(item => parseFloat(item.payload?.humidity ?? item.humidity));
             const press  = data.map(item => parseFloat(item.payload?.pressure ?? item.pressure));
