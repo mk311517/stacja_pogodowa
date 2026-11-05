@@ -21,15 +21,33 @@
         const API_URL = 'https://aqi6g2dpxi.execute-api.eu-north-1.amazonaws.com/telemetry';
 
         async function fetchData() {
-            const res = await fetch(API_URL);
-            const data = await res.json();
+    try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
 
-            const labels = data.map(item => item.timestamp);
-            const temps = data.map(item => item.temperature);
-            const hums = data.map(item => item.humidity);
+        if (!data || data.length === 0) return;
 
-            updateChart(labels, temps, hums);
-        }
+        // Podgląd struktury w konsoli F12
+        console.log("Struktura pierwszego elementu:", data[0]);
+
+        const labels = data.map(item => item.timestamp);
+        
+        // Pobranie wartości i konwersja na liczby z obsługą wielkości liter
+        const temps = data.map(item => {
+            const val = item.temperature ?? item.Temperature ?? item.temp;
+            return parseFloat(val);
+        });
+
+        const hums = data.map(item => {
+            const val = item.humidity ?? item.Humidity ?? item.hum;
+            return parseFloat(val);
+        });
+
+        updateChart(labels, temps, hums);
+    } catch (err) {
+        console.error("Błąd pobierania danych:", err);
+    }
+}
 
         let chart;
         function updateChart(labels, temps, hums) {
