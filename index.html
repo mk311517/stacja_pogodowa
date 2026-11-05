@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacja Atmosferyczna ESP32</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; margin: 20px; }
+        .chart-container { width: 90%; max-width: 800px; margin: 20px auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Odczyty z czujnika ESP32 + BME280</h2>
+    
+    <div class="chart-container">
+        <canvas id="tempChart"></canvas>
+    </div>
+
+    <script>
+        const API_URL = 'https://aqi6g2dpxi.execute-api.eu-north-1.amazonaws.com/telemetry';
+
+        async function fetchData() {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+
+            const labels = data.map(item => item.timestamp);
+            const temps = data.map(item => item.temperature);
+            const hums = data.map(item => item.humidity);
+
+            updateChart(labels, temps, hums);
+        }
+
+        let chart;
+        function updateChart(labels, temps, hums) {
+            const ctx = document.getElementById('tempChart').getContext('2d');
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Temperatura (°C)', data: temps, borderColor: '#ff4d4d', fill: false },
+                        { label: 'Wilgotność (%)', data: hums, borderColor: '#4da6ff', fill: false }
+                    ]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        fetchData();
+        setInterval(fetchData, 10000); // Odświeżanie co 10 sekund
+    </script>
+</body>
+</html>
